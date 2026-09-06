@@ -19,7 +19,7 @@ func (s *Service) Config(code *code.Code) error {
 	var (
 		cfgPackageName string
 		cfgName        string
-		i              int
+		i, j           int
 	)
 	for i = range s.Cfg.Config {
 		if s.Cfg.Config[i] == nil {
@@ -36,15 +36,15 @@ func (s *Service) Config(code *code.Code) error {
 		case 1:
 			code.MainWriteString("\"\", false, &", cfgName, ", &app.RegisterCenter{\n\t\tGroupId: \"", s.Cfg.Config[i].Nacos.GroupId, "\",\n\t\tDataId: \"", s.Cfg.Config[i].Nacos.DataId, "\",\n")
 			//update hook
-			if len(s.Cfg.Config[i].Nacos.UpdateHook) > 0 {
+			if s.Cfg.Config[i].Hook != nil && len(s.Cfg.Config[i].Hook.Update) > 0 {
 				code.MainWriteString("\t\tUpdateHook: func(obj interface{}) {\n")
-				for j := range s.Cfg.Config[i].Nacos.UpdateHook {
-					if s.Cfg.Config[i].Nacos.UpdateHook[j] == nil {
+				for j = range s.Cfg.Config[i].Hook.Update {
+					if s.Cfg.Config[i].Hook.Update[j] == nil {
 						continue
 					}
-					cfgPackageName = "cfgUpHookPackage" + strconv.Itoa(j)
-					code.ImportWriteString("\t", cfgPackageName, " \"", s.Cfg.Config[i].Nacos.UpdateHook[j].Path, "\"\n")
-					code.MainWriteString("\t\t\t", cfgPackageName, ".", s.Cfg.Config[i].Nacos.UpdateHook[j].Name, "()\n")
+					cfgPackageName = "cfgHookUpPackage" + strconv.Itoa(j)
+					code.ImportWriteString("\t", cfgPackageName, " \"", s.Cfg.Config[i].Hook.Update[j].Path, "\"\n")
+					code.MainWriteString("\t\t\t", cfgPackageName, ".", s.Cfg.Config[i].Hook.Update[j].Name, "(a.ProxyConfig())\n")
 				}
 				code.MainWriteString("\t\t}\n")
 			}
@@ -56,7 +56,14 @@ func (s *Service) Config(code *code.Code) error {
 			"\t\tpanic(err)\n",
 			"\t}\n",
 		)
-
+		for j = range s.Cfg.Config[i].Hook.Get {
+			if s.Cfg.Config[i].Hook.Get[j] == nil {
+				continue
+			}
+			cfgPackageName = "cfgHookGetPackage" + strconv.Itoa(j)
+			code.ImportWriteString("\t", cfgPackageName, " \"", s.Cfg.Config[i].Hook.Get[j].Path, "\"\n")
+			code.MainWriteString("\t", cfgPackageName, ".", s.Cfg.Config[i].Hook.Get[j].Name, "(a.ProxyConfig())\n")
+		}
 	}
 	return nil
 }
