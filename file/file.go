@@ -3,6 +3,7 @@ package file
 import (
 	"errors"
 	"os"
+	"path/filepath"
 )
 
 type File struct {
@@ -17,7 +18,22 @@ func New(path string) *File {
 }
 
 func (f *File) Init() error {
-	var err error
+	var (
+		dir = filepath.Dir(f.Path)
+		err error
+	)
+	_, err = os.Stat(dir)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return err
+		}
+		if err = os.MkdirAll(dir, 0755); err != nil {
+			return err
+		}
+	}
+	if err != nil {
+		return err
+	}
 	f.File, err = os.OpenFile(f.Path, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
 		return err

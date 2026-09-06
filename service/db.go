@@ -37,7 +37,7 @@ func (s *Service) DB(code *code.Code) error {
 				strconv.Itoa(s.Cfg.DB.MySQL[i].Idle), ", ",
 				strconv.Itoa(s.Cfg.DB.MySQL[i].IdleTimeout),
 				"); err != nil {\n",
-				"\t\tpainc(err)\n",
+				"\t\tpanic(err)\n",
 				"\t}\n",
 			)
 		}
@@ -59,7 +59,7 @@ func (s *Service) DB(code *code.Code) error {
 				strconv.Itoa(s.Cfg.DB.Redis[i].Idle), ", ",
 				strconv.Itoa(s.Cfg.DB.Redis[i].IdleTimeout),
 				"); err != nil {\n",
-				"\t\tpainc(err)\n",
+				"\t\tpanic(err)\n",
 				"\t}\n",
 			)
 		}
@@ -91,7 +91,7 @@ func (s *Service) DB(code *code.Code) error {
 				strconv.Itoa(s.Cfg.DB.MongoDB[i].Idle), ", ",
 				strconv.Itoa(s.Cfg.DB.MongoDB[i].IdleTimeout),
 				"); err != nil {\n",
-				"\t\tpainc(err)\n",
+				"\t\tpanic(err)\n",
 				"\t}\n",
 			)
 		}

@@ -40,7 +40,7 @@ func (s *Service) Config(code *code.Code) error {
 			code.MainWriteString("\"", s.Cfg.Config[i].Local.Name, "\", true, &", cfgName, ", nil")
 		}
 		code.MainWriteString("); err != nil {\n",
-			"\t\tpainc(err)\n",
+			"\t\tpanic(err)\n",
 			"\t}\n",
 		)
 

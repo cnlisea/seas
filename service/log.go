@@ -20,7 +20,7 @@ func (s *Service) Log(code *code.Code) error {
 		"true",
 		"0",
 		"); err != nil {\n",
-		"\t\tpainc(err)\n",
+		"\t\tpanic(err)\n",
 		"\t}\n",
 	)
 	return nil

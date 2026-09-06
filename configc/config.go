@@ -46,7 +46,7 @@ func (c *ConfigC) Run(buffer *code.Code) error {
 			buffer.MainWriteString("\t\t},\n")
 		}
 		buffer.MainWriteString("\t}); err != nil {\n")
-		buffer.MainWriteString("\t\tpainc(err)\n")
+		buffer.MainWriteString("\t\tpanic(err)\n")
 		buffer.MainWriteString("\t}\n")
 	}
 	return nil

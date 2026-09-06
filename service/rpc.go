@@ -27,10 +27,10 @@ func (s *Service) Rpc(code *code.Code) error {
 		code.ImportWriteString("\t", rpcPackageName, " \"", s.Cfg.Rpc[i].Path, "\"\n")
 		if s.Cfg.Rpc[i].Offline != nil && !offlineExist {
 			offlineExist = true
-			code.MainWriteString("\t var rpcState bool\n")
+			code.MainWriteString("\tvar rpcState bool\n")
 		}
 		if s.Cfg.Rpc[i].Offline != nil {
-			code.MainWriteString("\t rpcState = ", strconv.FormatBool(*s.Cfg.Rpc[i].Offline), "\n")
+			code.MainWriteString("\trpcState = ", strconv.FormatBool(*s.Cfg.Rpc[i].Offline), "\n")
 		}
 		code.MainWriteString("\tif err = a.NetRpcRegister(\"",
 			s.Cfg.Name,
@@ -73,8 +73,8 @@ func (s *Service) Rpc(code *code.Code) error {
 				}
 			}
 		}
-		code.MainWriteString(")); err != nil {\\n",
-			"\t\tpainc(err)\n",
+		code.MainWriteString(")); err != nil {\n",
+			"\t\tpanic(err)\n",
 			"\t}\n")
 	}
 	return nil

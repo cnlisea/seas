@@ -68,7 +68,7 @@ func (a *App) Init() error {
 			return errors.New("service run fail: " + err.Error())
 		}
 		// write file
-		f = file.New("./main.go")
+		f = file.New("cmd/main.go")
 		if err = f.Init(); err != nil {
 			return errors.New("file init fail: " + err.Error())
 		}
