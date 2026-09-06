@@ -30,21 +30,15 @@ func (a *App) Init() error {
 		return errors.New("service config not settings")
 	}
 
-	var codeBuffer = code.New()
-	//buffer.WriteString("package main\n\n")
-	//buffer.WriteString("import (\n")
-	//buffer.WriteString("\t\"github.com/cnlisea/ant/app\"\n")
-	//buffer.WriteString(")\n\n")
-	codeBuffer.MainWriteString("func main() {\n")
-	codeBuffer.MainWriteString("\tvar (\n")
-	codeBuffer.MainWriteString("\t\ta = app.New()\n")
-	codeBuffer.MainWriteString("\t\terr   error\n")
-	codeBuffer.MainWriteString("\t)\n")
+	var (
+		codeBuffer = code.New()
+		err        error
+	)
+	// code
+	if err = codeBuffer.Init(); err != nil {
+		return errors.New("code init fail: " + err.Error())
+	}
 
-	// main last
-	codeBuffer.MainLastWriteString("\ta.Run()\n", "}\n")
-
-	var err error
 	// config center
 	if a.Cfg.Config != nil {
 		cc := configc.New(a.Cfg.Config)
