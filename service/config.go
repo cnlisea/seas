@@ -26,16 +26,29 @@ func (s *Service) Config(code *code.Code) error {
 			continue
 		}
 		cfgPackageName = "cfgPackage" + strconv.Itoa(i)
-		code.ImportWriteString("\t", cfgPackageName, " \"", s.Cfg.Config[i].Path, "\"")
-		code.MainWriteString("\tvar ", cfgName, cfgPackageName, ".", s.Cfg.Config[i].Name)
+		code.ImportWriteString("\t", cfgPackageName, " \"", s.Cfg.Config[i].Path, "\"\n")
 		cfgName = "cfg" + strconv.Itoa(i)
+		code.MainWriteString("\tvar ", cfgName, " ", cfgPackageName, ".", s.Cfg.Config[i].Name)
 		code.MainWriteString("\tif err = a.ConfigRegister(",
 			"\"", s.Cfg.Config[i].Key, "\", ",
 		)
 		switch s.Cfg.Config[i].Channel {
 		case 1:
-			code.MainWriteString("\"\", false, &", cfgName, ", &app.RegisterCenter{GroupId: \"", s.Cfg.Config[i].Nacos.GroupId, "\", DataId:  \"", s.Cfg.Config[i].Nacos.DataId, "\"}")
-
+			code.MainWriteString("\"\", false, &", cfgName, ", &app.RegisterCenter{\n\t\tGroupId: \"", s.Cfg.Config[i].Nacos.GroupId, "\",\n\t\tDataId: \"", s.Cfg.Config[i].Nacos.DataId, "\",\n")
+			//update hook
+			if len(s.Cfg.Config[i].Nacos.UpdateHook) > 0 {
+				code.MainWriteString("\t\tUpdateHook: func(obj interface{}) {\n")
+				for j := range s.Cfg.Config[i].Nacos.UpdateHook {
+					if s.Cfg.Config[i].Nacos.UpdateHook[j] == nil {
+						continue
+					}
+					cfgPackageName = "cfgUpHookPackage" + strconv.Itoa(j)
+					code.ImportWriteString("\t", cfgPackageName, " \"", s.Cfg.Config[i].Nacos.UpdateHook[j].Path, "\"\n")
+					code.MainWriteString("\t\t\t", cfgPackageName, ".", s.Cfg.Config[i].Nacos.UpdateHook[j].Name, "()\n")
+				}
+				code.MainWriteString("\t\t}\n")
+			}
+			code.MainWriteString("}")
 		default:
 			code.MainWriteString("\"", s.Cfg.Config[i].Local.Name, "\", true, &", cfgName, ", nil")
 		}
