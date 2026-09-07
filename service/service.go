@@ -27,6 +27,11 @@ func (s *Service) Run(code *code.Code) error {
 	code.MainWriteString("\t//service\n")
 
 	var err error
+	// flag
+	if err = s.Flag(code); err != nil {
+		return errors.New("service flag fail: " + err.Error())
+	}
+
 	// config
 	if err = s.Config(code); err != nil {
 		return errors.New("service config fail: " + err.Error())
@@ -40,6 +45,11 @@ func (s *Service) Run(code *code.Code) error {
 	//db
 	if err = s.DB(code); err != nil {
 		return errors.New("service db fail: " + err.Error())
+	}
+
+	//mq
+	if err = s.MQ(code); err != nil {
+		return errors.New("service mq fail: " + err.Error())
 	}
 
 	//rpc

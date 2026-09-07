@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/alecthomas/kingpin/v2 v2.4.0
-	github.com/cnlisea/ant v1.1.0
+	github.com/cnlisea/ant v1.1.2
 )
 
 require (

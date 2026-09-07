@@ -1,11 +1,14 @@
 package config
 
 type Service struct {
+	Version   string           `yaml:"version"`
 	GroupName string           `yaml:"group_name"`
 	Name      string           `yaml:"name"`
+	Flag      []*ServiceFlag   `yaml:"flag"`
 	Listen    *ServiceListen   `yaml:"listen"`
 	Config    []*ServiceConfig `yaml:"config"`
 	DB        *ServiceDB       `yaml:"db"`
+	MQ        []*ServiceMQ     `yaml:"mq"`
 	Rpc       []*ServiceRpc    `yaml:"rpc"`
 	Log       *ServiceLog      `yaml:"log"`
 }
