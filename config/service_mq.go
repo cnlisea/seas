@@ -23,9 +23,8 @@ type ServiceMQSubscribe struct {
 }
 
 type ServiceMQSubscribeConfig struct {
-	Topic string   `yaml:"topic"` // 主题名称
-	Tag   string   `yaml:"tag"`   // 标签
-	Path  string   `yaml:"path"`  // 服务所在路径
-	Name  string   `yaml:"name"`  // 服务名称
-	Param []string `yaml:"param"` // 服务参数
+	Topic string `yaml:"topic"` // 主题名称
+	Tag   string `yaml:"tag"`   // 标签
+	Path  string `yaml:"path"`  // 服务所在路径
+	Name  string `yaml:"name"`  // 服务名称
 }

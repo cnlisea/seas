@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -30,9 +31,11 @@ func (s *Service) MQ(code *code.Code) error {
 		nsBuf.WriteString("[]string{")
 		for j = range s.Cfg.MQ[i].NameServer {
 			if j > 0 {
-				code.MainWriteString(", ")
+				nsBuf.WriteString(", ")
 			}
-			code.MainWriteString("\"", s.Cfg.MQ[i].NameServer[j], "\"")
+			nsBuf.WriteString("\"")
+			nsBuf.WriteString(s.Cfg.MQ[i].NameServer[j])
+			nsBuf.WriteString("\"")
 		}
 		nsBuf.WriteString("}")
 		// product
@@ -75,7 +78,7 @@ func (s *Service) MQ(code *code.Code) error {
 					"\t\t\tTag: \"", s.Cfg.MQ[i].Subscribe[j].Config[k].Tag, "\",\n",
 					"\t\t\tHandler: ",
 				)
-				subImportPackageName = "mqSubscribe" + s.Cfg.MQ[i].Subscribe[j].Name + strconv.Itoa(k)
+				subImportPackageName = fmt.Sprintf("mqSubscribe_%d_%d_%d", i, j, k)
 				code.ImportWriteString("\t", subImportPackageName, " \"", s.Cfg.MQ[i].Subscribe[j].Config[k].Path, "\"\n")
 
 				code.MainWriteString(subImportPackageName, ".", s.Cfg.MQ[i].Subscribe[j].Config[k].Name, ",\n")

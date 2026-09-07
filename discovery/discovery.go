@@ -31,11 +31,12 @@ func (d *Discovery) Run(buffer *code.Code) error {
 			return errors.New("discovery nacos param invalid")
 		}
 
+		buffer.ImportWriteString("\tdiscoveryProxy \"github.com/cnlisea/ant/app/proxy\"\n")
 		buffer.MainWriteString("\t//discovery\n")
 
 		buffer.MainWriteString("\tif err = a.Discovery(\"")
 		buffer.MainWriteString(d.Cfg.Nacos.NamespaceId)
-		buffer.MainWriteString("\", []*app.DiscoveryNode{\n")
+		buffer.MainWriteString("\", []*discoveryProxy.DiscoveryNode{\n")
 		for i := range d.Cfg.Nacos.Nodes {
 			buffer.MainWriteString("\t\t{\n")
 			buffer.MainWriteString("\t\t\tAddr: \"")

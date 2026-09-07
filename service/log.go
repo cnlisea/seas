@@ -18,7 +18,7 @@ func (s *Service) Log(code *code.Code) error {
 	code.MainWriteString("\tif err = a.Logger(\"", s.Cfg.Log.Path, "\", ",
 		strconv.FormatUint(uint64(s.Cfg.Log.Level), 10), ", ",
 		"true",
-		"0",
+		", 0",
 		"); err != nil {\n",
 		"\t\tpanic(err)\n",
 		"\t}\n",

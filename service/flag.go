@@ -21,14 +21,18 @@ func (s *Service) Flag(code *code.Code) error {
 	var (
 		num    = len(s.Cfg.Flag)
 		cfgMap = make(map[string]string, num)
+		short  []rune
 		cmdVar string
 		i      int
 	)
 	for i = 0; i < num; i++ {
 		cmdVar = "cmdVar" + strconv.Itoa(i)
 		code.MainWriteString("\tvar ", cmdVar, " = kingpin.Flag(\"", s.Cfg.Flag[i].Name, "\", \"", s.Cfg.Flag[i].Help, "\")")
-		if s.Cfg.Flag[i].Short != 0 {
-			code.MainWriteString(".Short('", string(s.Cfg.Flag[i].Short), "')")
+		if s.Cfg.Flag[i].Short != "" {
+			short = []rune(s.Cfg.Flag[i].Short)
+			if len(short) > 0 {
+				code.MainWriteString(".Short('", string(short[0]), "')")
+			}
 		}
 		if s.Cfg.Flag[i].Require {
 			code.MainWriteString(".Required()")
@@ -39,21 +43,19 @@ func (s *Service) Flag(code *code.Code) error {
 		if s.Cfg.Flag[i].Env != "" {
 			code.MainWriteString(".Envar(\"", s.Cfg.Flag[i].Env, "\")")
 		}
-		code.MainWriteString(".String()")
+		code.MainWriteString(".String()\n")
 		cfgMap[s.Cfg.Flag[i].Key] = cmdVar
 	}
 	if s.Cfg.Version != "" {
 		code.MainWriteString("\tkingpin.Version(\"", s.Cfg.Version, "\")\n",
 			"\tkingpin.HelpFlag.Short('I')\n")
 	}
-	code.MainWriteString("kingpin.Parse()")
+	code.MainWriteString("\tkingpin.Parse()\n")
 
-	const cmdValCfgKey = "cmdVarCfg "
-	code.MainWriteString("\tvar ", cmdValCfgKey, " = map[string]string{\n")
+	code.MainWriteString("\ta.ProxyConfig().SetCfg(\"flag\", ", "map[string]string{\n")
 	for k, v := range cfgMap {
-		code.MainWriteString("\t\t\"", k, "\": \"", v, "\",\n")
+		code.MainWriteString("\t\t\"", k, "\": *", v, ",\n")
 	}
-	code.MainWriteString("\t}")
-	code.MainWriteString("\ta.ProxyConfig().SetCfg(\"flag\", ", cmdValCfgKey, ")\n")
+	code.MainWriteString("\t})\n")
 	return nil
 }
