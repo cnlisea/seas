@@ -84,7 +84,7 @@ func (s *Service) MQ(code *code.Code) error {
 				code.MainWriteString(subImportPackageName, ".", s.Cfg.MQ[i].Subscribe[j].Config[k].Name, ",\n")
 				code.MainWriteString("\t\t},\n")
 			}
-			code.MainWriteString("\t}); err != nil {",
+			code.MainWriteString("\t}); err != nil {\n",
 				"\t\tpanic(err)\n",
 				"\t}\n",
 			)
