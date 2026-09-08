@@ -25,8 +25,9 @@ ADD . .
 
 # Build app
 RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags "-s -w" -o cmd/app cmd/main.go && \
-    chmod +x tools/upx && \
-    tools/upx cmd/app
+    cp $(find $GOPATH/pkg/mod/github.com/cnlisea/seas* -maxdepth 0 | head -n 1)/build/tool/upx cmd/upx && \
+    chmod +x cmd/upx && \
+    cmd/upx cmd/app
 
 # pack app and config
 RUN if [ -f $ASSETSPATH ];then \
