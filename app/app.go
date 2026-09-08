@@ -1,8 +1,10 @@
 package app
 
 import (
+	"container/list"
 	"errors"
-	"fmt"
+	"os/exec"
+
 	"github.com/cnlisea/seas/code"
 	"github.com/cnlisea/seas/config"
 	"github.com/cnlisea/seas/configc"
@@ -12,12 +14,14 @@ import (
 )
 
 type App struct {
-	Cfg *config.App
+	Cfg      *config.App
+	Services *list.List
 }
 
 func New(cfg *config.App) *App {
 	return &App{
-		Cfg: cfg,
+		Cfg:      cfg,
+		Services: list.New(),
 	}
 }
 
@@ -59,7 +63,6 @@ func (a *App) Init() error {
 	var (
 		s     *service.Service
 		clone *code.Code
-		f     *file.File
 	)
 	for i := 0; i < serviceNum; i++ {
 		clone = codeBuffer.Clone()
@@ -67,22 +70,53 @@ func (a *App) Init() error {
 		if err = s.Run(clone); err != nil {
 			return errors.New("service run fail: " + err.Error())
 		}
-		// write file
-		f = file.New("cmd/main.go")
-		if err = f.Init(); err != nil {
-			return errors.New("file init fail: " + err.Error())
-		}
-		if _, err = f.WriteString(clone.Code()); err != nil {
-			return errors.New("file write string fail: " + err.Error())
-		}
-		f.Close()
-		fmt.Printf("num:%d, code:\n%s\n", i, clone.Code())
+		clone.Name = a.Cfg.Services[i].Name
+		clone.Version = a.Cfg.Services[i].Version
+		a.Services.PushBack(clone)
 	}
-
 	return nil
 }
 
 func (a *App) Run() error {
+	if a.Services.Len() == 0 {
+		return nil
+	}
+	var (
+		e   *list.Element
+		c   *code.Code
+		f   *file.File
+		cmd *exec.Cmd
+		err error
+	)
+	for e = a.Services.Front(); e != nil; e = e.Next() {
+		c = e.Value.(*code.Code)
 
+		// gen main.go file
+		f = file.New("cmd/main.go")
+		if err = f.Init(); err != nil {
+			return errors.New("file init fail: " + err.Error())
+		}
+		if _, err = f.WriteString(c.Code()); err != nil {
+			return errors.New("file write string fail: " + err.Error())
+		}
+		f.Close()
+
+		// copy upx
+		cmd = exec.Command("cp",
+			`$GOPATH/src/github.com/cnlisea/seas/build/tool/upx`,
+			`$GOPATH/src/github.com/cnlisea/seas/build/docker/Dockerfile`,
+			"cmd/")
+		_, err = cmd.Output()
+		if err != nil {
+			return errors.New("exec cp upx and Dockerfile fail: " + err.Error())
+		}
+
+		// docker build
+		cmd = exec.Command("docker", "build", "-t", c.Name+":"+c.Version, "-f", "cmd/Dockerfile")
+		_, err = cmd.Output()
+		if err != nil {
+			return errors.New("exec docker fail: " + err.Error())
+		}
+	}
 	return nil
 }

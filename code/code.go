@@ -6,6 +6,8 @@ import (
 )
 
 type Code struct {
+	Name     string
+	Version  string
 	Import   *list.List
 	Main     *list.List
 	MainLast *list.List
